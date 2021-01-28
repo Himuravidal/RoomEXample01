@@ -15,17 +15,16 @@ abstract class TaskDataBase: RoomDatabase() {
         private var INSTANCE : TaskDataBase? = null
 
         fun getDataBase(context: Context): TaskDataBase {
-            val tempInstance = INSTANCE
-            if (tempInstance != null) {
-                return tempInstance
-            }
-            synchronized(this) {
-                val instance = Room.databaseBuilder(context.applicationContext,
-                    TaskDataBase::class.java, "taskDB")
-                    .build()
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        TaskDataBase::class.java,
+                        "taskDB")
+                        .build()
                 INSTANCE = instance
-                return instance
+                instance
             }
+
         }
     }
 }

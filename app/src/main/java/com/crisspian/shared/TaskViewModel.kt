@@ -1,25 +1,19 @@
 package com.crisspian.shared
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.crisspian.shared.model.Task
-import com.crisspian.shared.model.TaskDataBase
 import com.crisspian.shared.model.TaskRepository
 import kotlinx.coroutines.launch
+import java.lang.IllegalArgumentException
 
-class TaskViewModel(application: Application) : AndroidViewModel(application) {
+class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
 
-    private val repository: TaskRepository
     //LiveData de tareas
-    val allTask : LiveData<List<Task>>
+    val allTask : LiveData<List<Task>> = repository.listAllTask
 
-    init {
-        val taskDao = TaskDataBase.getDataBase(application).getTaskDao()
-        repository = TaskRepository(taskDao)
-        allTask = repository.listAllTask
-    }
 
     fun insertTask(task: Task) = viewModelScope.launch {
         repository.insertTask(task)
@@ -29,4 +23,14 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         repository.deleteAllTask()
     }
 
+}
+
+class TaskViewModelFactory(private val repository: TaskRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+       if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
+           @Suppress("UNCHECKED_CAST")
+           return TaskViewModel(repository) as T
+       }
+        throw  IllegalArgumentException("Unknow viewmodel class")
+    }
 }

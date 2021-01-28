@@ -1,7 +1,6 @@
 package com.crisspian.shared
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +18,10 @@ import com.crisspian.shared.model.Task
 class FirstFragment : Fragment() {
 
     private lateinit var binding: FragmentFirstBinding
-    private val viewModel : TaskViewModel by activityViewModels()
+
+    private val viewModel : TaskViewModel by activityViewModels {
+        TaskViewModelFactory((activity?.application as AppTask).repository)
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
